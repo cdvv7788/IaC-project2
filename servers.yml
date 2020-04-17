@@ -113,6 +113,24 @@ Resources:
       ListenerArn:
         Ref: Listener
       Priority: 1
+  CloudWatchAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      ActionsEnabled: false
+      AlarmDescription: Test alarm to showcase CloudWatch usage
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      EvaluationPeriods: 1
+      Period: 60
+      Statistic: Sum
+      MetricName: RequestCount
+      Namespace: "AWS/ApplicationELB"
+      Dimensions:
+        - Name: LoadBalancer
+          Value:
+            Fn::GetAtt:
+              - AppLoadBalancer
+              - LoadBalancerFullName
+      Threshold: 5
 Outputs:
   LoadBalancerUrl:
     Description: URL to access the application
