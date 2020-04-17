@@ -41,6 +41,30 @@ Resources:
         - DeviceName: "/dev/sdk"
           Ebs:
             VolumeSize: 10
+  AppTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckIntervalSeconds: 10
+      HealthCheckPath: /
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 8
+      HealthyThresholdCount: 2
+      Port: 80
+      Protocol: HTTP
+      UnhealthyThresholdCount: 5
+      VpcId:
+        Fn::ImportValue: !Sub "${EnvironmentName}-VPCID"
+  AppAutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      VPCZoneIdentifier:
+        - Fn::ImportValue: !Sub "${EnvironmentName}-PRIV-NETS"
+      LaunchConfigurationName:
+        Ref: AppLaunchConfiguration
+      MinSize: 3
+      MaxSize: 5
+      TargetGroupARNs:
+        - Ref: AppTargetGroup
     #instace profile contains the IAM Role name(s) that we want to associate to our auto scaling EC2 Servers
 #  ProfileWithRolesForOurApp:
 #    Type: AWS::IAM::InstanceProfile
